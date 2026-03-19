@@ -19,6 +19,7 @@ export default async function Home() {
                 projects.map((project) => (
                             <div key={project.id} style={{ border: '1px solid #ccc', padding: '20px', marginTop: '10px' }}>
                         <h2>{project.title}</h2>
+                        <img src={project.image_url} />
                         <p>{project.description}</p>
                         <small>SEO Slug: {project.slug}</small>
                     </div> // Added closing di
