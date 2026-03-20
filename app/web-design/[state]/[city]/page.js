@@ -119,9 +119,6 @@ export async function generateMetadata({ params }) {
         'max-snippet': -1,
       },
     },
-    verification: {
-      google: 'your-google-verification-code',
-    },
   };
 }
 
@@ -146,6 +143,29 @@ export default async function CityPage({ params }) {
     .limit(6);
 
   const safeProjects = projects || [];
+
+  // Reusable CTA Buttons Component
+  const CTAButtons = ({ isCompact = false, alignment = 'center' }) => (
+    <div className={`flex flex-col sm:flex-row gap-3 sm:gap-4 ${alignment === 'center' ? 'justify-center' : 'justify-start'} ${isCompact ? 'mt-4' : 'mt-6 sm:mt-8'}`}>
+      <a
+        href={`https://wa.me/2349031493116?text=Hi%20justified%20media%2C%20I'm%20interested%20in%20a%20website%20for%20my%20business%20in%20${encodeURIComponent(formattedCity)}%2C%20${encodeURIComponent(formattedState)}.`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`group relative ${isCompact ? 'px-4 py-2 text-sm' : 'px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base md:text-lg'} bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-semibold hover:from-green-500 hover:to-green-600 transition-all duration-300 shadow-2xl shadow-green-500/20 text-center w-full sm:w-auto`}
+      >
+        <span className="relative z-10">Chat on WhatsApp</span>
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-400 to-green-500 opacity-0 group-hover:opacity-20 transition-opacity blur-xl"></div>
+      </a>
+      
+      <a
+        href={`mailto:ofororayej@gmail.com?subject=Website%20Inquiry%20for%20${formattedCity}&body=Hi%20justified%20media%2C%20I'm%20interested%20in%20a%20website%20for%20my%20business%20in%20${formattedCity}%2C%20${formattedState}.`}
+        className={`group relative ${isCompact ? 'px-4 py-2 text-sm' : 'px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base md:text-lg'} bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-2xl shadow-blue-500/20 text-center w-full sm:w-auto`}
+      >
+        <span className="relative z-10">Email Us</span>
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity blur-xl"></div>
+      </a>
+    </div>
+  );
 
   // Structured data for rich snippets
   const structuredData = {
@@ -185,39 +205,24 @@ export default async function CityPage({ params }) {
       <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-blue-50">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-600 to-sky-400 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
             <div className="max-w-4xl">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
                 Best Web Designer in {formattedCity}, {formattedState}
               </h1>
-              <p className="text-xl text-blue-50 mb-8 max-w-3xl">
+              <p className="text-base sm:text-lg md:text-xl text-blue-50 mb-6 sm:mb-8 max-w-3xl">
                 justified media creates stunning, high-converting websites that help businesses in {formattedCity} stand out and attract more customers. 
                 Professional web design tailored to your local market.
               </p>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href={`https://wa.me/2349031493116?text=Hi%20justified%20media%2C%20I'm%20interested%20in%20a%20website%20for%20my%20business%20in%20${encodeURIComponent(formattedCity)}%2C%20${encodeURIComponent(formattedState)}.`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-8 py-4 bg-white text-blue-600 rounded-2xl text-lg font-semibold hover:bg-blue-50 transition-all shadow-2xl shadow-blue-500/30"
-                >
-                  Get Free Quote
-                </a>
-                <a
-                  href="#pricing"
-                  className="px-8 py-4 bg-blue-500/20 backdrop-blur-sm border border-white/30 text-white rounded-2xl text-lg font-semibold hover:bg-blue-500/30 transition-all"
-                >
-                  View Pricing
-                </a>
-              </div>
+              <CTAButtons />
             </div>
           </div>
         </div>
 
-        {/* Trust Badges */}
-        <div className="bg-white/50 backdrop-blur-sm border-b border-blue-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        {/* Trust Badges - Sticky on mobile */}
+        <div className="bg-white/50 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
               {[
                 { number: '50+', label: `Projects in ${formattedState}` },
                 { number: '5+', label: 'Years Experience' },
@@ -225,25 +230,32 @@ export default async function CityPage({ params }) {
                 { number: '24/7', label: 'Support' },
               ].map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{stat.number}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">{stat.number}</div>
+                  <div className="text-xs sm:text-sm text-gray-600">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           {/* Why Choose Us Section */}
-          <section className="mb-24">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              Why Choose justified media for Web Design in {formattedCity}, {formattedState}
-            </h2>
-            <p className="text-lg text-gray-600 mb-12 max-w-3xl">
-              We specialize in creating websites that help local businesses in {formattedCity} attract more customers and grow online.
-            </p>
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  Why Choose justified media in {formattedCity}, {formattedState}
+                </h2>
+                <p className="text-base sm:text-lg text-gray-600 mt-2 max-w-3xl">
+                  We specialize in creating websites that help local businesses in {formattedCity} attract more customers and grow online.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <CTAButtons isCompact={true} alignment="right" />
+              </div>
+            </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {[
                 {
                   title: `Local SEO Experts`,
@@ -270,23 +282,34 @@ export default async function CityPage({ params }) {
                   color: 'from-blue-600 to-indigo-600'
                 }
               ].map((item, index) => (
-                <div key={index} className="bg-white rounded-2xl p-8 shadow-xl shadow-blue-100/50 border border-blue-100 hover:shadow-2xl hover:shadow-blue-200/50 transition-all">
-                  <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center text-3xl mb-6 text-white`}>
+                <div key={index} className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 shadow-xl shadow-blue-100/50 border border-blue-100 hover:shadow-2xl hover:shadow-blue-200/50 transition-all">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br ${item.color} rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 text-white`}>
                     {item.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3 text-gray-900">{item.title}</h3>
+                  <p className="text-sm sm:text-base text-gray-600">{item.description}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* How Long Does It Take Section */}
-          <section className="mb-24 bg-gradient-to-r from-blue-50 to-sky-50 rounded-3xl p-12">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              How Long Does It Take to Build a Website in {formattedCity}?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
+          <section className="mb-16 sm:mb-20 md:mb-24 bg-gradient-to-r from-blue-50 to-sky-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  How Long Does It Take to Build a Website in {formattedCity}?
+                </h2>
+                <p className="text-base sm:text-lg text-gray-600 mt-2">
+                  Get your business online fast with our efficient process.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <CTAButtons isCompact={true} />
+              </div>
+            </div>
+            
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {[
                 {
                   days: '5-7',
@@ -308,15 +331,15 @@ export default async function CityPage({ params }) {
                   features: ['3-4 weeks', 'Payment integration', 'Product management']
                 }
               ].map((item, index) => (
-                <div key={index} className={`bg-white rounded-2xl p-8 ${item.highlight ? 'ring-2 ring-blue-500 shadow-2xl scale-105' : 'shadow-xl'}`}>
-                  <div className="text-5xl font-bold text-blue-600 mb-2">{item.days}</div>
-                  <div className="text-sm text-blue-500 mb-4">days</div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{item.title}</h3>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
+                <div key={index} className={`bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 ${item.highlight ? 'ring-2 ring-blue-500 shadow-2xl scale-105' : 'shadow-xl'}`}>
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-600 mb-2">{item.days}</div>
+                  <div className="text-xs sm:text-sm text-blue-500 mb-3 sm:mb-4">days</div>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-900">{item.title}</h3>
+                  <p className="text-sm sm:text-base text-gray-600 mb-4">{item.description}</p>
                   <ul className="space-y-2">
                     {item.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600">
-                        <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                      <li key={idx} className="flex items-center text-xs sm:text-sm text-gray-600">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {feature}
@@ -329,80 +352,120 @@ export default async function CityPage({ params }) {
           </section>
 
           {/* Featured Projects */}
-          <section className="mb-24">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              Websites We've Built for Businesses in {formattedState}
-            </h2>
-            <p className="text-lg text-gray-600 mb-12">
-              See how we've helped businesses like yours succeed online.
-            </p>
-
-            <div className="space-y-12">
-              {safeProjects.map((project, index) => {
-                const hasValidImage = project.image_url && isValidImageUrl(project.image_url);
-                const gradientClass = gradientColors[index % gradientColors.length];
-                
-                return (
-                  <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 bg-white rounded-3xl shadow-xl overflow-hidden border border-blue-100`}>
-                    <div className="lg:w-1/2 relative h-96">
-                      {hasValidImage ? (
-                        <Image
-                          src={project.image_url}
-                          alt={project.title || 'Project showcase'}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                          className="object-cover"
-                          unoptimized={project.image_url.includes('via.placeholder.com')}
-                        />
-                      ) : (
-                        <div className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
-                          <span className="text-8xl font-bold text-white opacity-30">
-                            {project.title ? project.title.charAt(0).toUpperCase() : 'JM'}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="lg:w-1/2 p-12 flex flex-col justify-center">
-                      <div className="text-sm text-blue-600 font-semibold mb-2">FEATURED PROJECT</div>
-                      <h3 className="text-3xl font-bold mb-4 text-gray-900">{project.title || 'Untitled Project'}</h3>
-                      <p className="text-gray-600 text-lg mb-6">{project.description || 'No description available'}</p>
-                      {project.tech_stack && project.tech_stack.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-8">
-                          {project.tech_stack.map((tech, idx) => (
-                            <span key={idx} className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-medium">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <a
-                        href={`https://wa.me/2349031493116?text=Hi%20justified%20media%2C%20I%20saw%20the%20${project.title || 'project'}%20and%20I'm%20interested%20in%20a%20similar%20website%20for%20my%20business%20in%20${encodeURIComponent(formattedCity)}.`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700"
-                      >
-                        Want a similar website?
-                        <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  Websites We've Built for Businesses in {formattedState}
+                </h2>
+                <p className="text-base sm:text-lg text-gray-600 mt-2">
+                  See how we've helped businesses like yours succeed online.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <CTAButtons isCompact={true} />
+              </div>
             </div>
+
+            {safeProjects.length === 0 ? (
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center">
+                <p className="text-lg sm:text-xl text-blue-800 mb-2">✨ Projects Coming Soon</p>
+                <p className="text-sm sm:text-base text-blue-600">We're currently updating our portfolio. Check back soon!</p>
+              </div>
+            ) : (
+              <div className="space-y-8 sm:space-y-12">
+                {safeProjects.map((project, index) => {
+                  const hasValidImage = project.image_url && isValidImageUrl(project.image_url);
+                  const gradientClass = gradientColors[index % gradientColors.length];
+                  
+                  return (
+                    <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-6 sm:gap-8 bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-blue-100`}>
+                      <div className="lg:w-1/2 relative h-64 sm:h-80 lg:h-96">
+                        {hasValidImage ? (
+                          <Image
+                            src={project.image_url}
+                            alt={project.title || 'Project showcase'}
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                            className="object-cover"
+                            unoptimized={project.image_url.includes('via.placeholder.com')}
+                          />
+                        ) : (
+                          <div className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
+                            <span className="text-6xl sm:text-7xl lg:text-8xl font-bold text-white opacity-30">
+                              {project.title ? project.title.charAt(0).toUpperCase() : 'JM'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="lg:w-1/2 p-6 sm:p-8 lg:p-12 flex flex-col justify-center">
+                        <div className="text-xs sm:text-sm text-blue-600 font-semibold mb-2">FEATURED PROJECT</div>
+                        <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 text-gray-900">{project.title || 'Untitled Project'}</h3>
+                        <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 sm:mb-6">{project.description || 'No description available'}</p>
+                        {project.tech_stack && project.tech_stack.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-6 sm:mb-8">
+                            {project.tech_stack.map((tech, idx) => (
+                              <span key={idx} className="px-3 sm:px-4 py-1 sm:py-2 bg-blue-50 text-blue-700 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium">
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Live Website Link */}
+                        {project.live_url && (
+                          <a
+                            href={project.live_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 mb-4 sm:mb-6 text-sm sm:text-base group"
+                          >
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Visit Live Website
+                            <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                          </a>
+                        )}
+                        
+                        <a
+                          href={`https://wa.me/2349031493116?text=Hi%20justified%20media%2C%20I%20saw%20the%20${project.title || 'project'}%20and%20I'm%20interested%20in%20a%20similar%20website%20for%20my%20business%20in%20${encodeURIComponent(formattedCity)}.`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 text-sm sm:text-base"
+                        >
+                          Want a similar website?
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
           {/* How Much Does It Cost Section */}
-          <section className="mb-24" id="pricing">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              How Much Does a Website Cost in {formattedState}?
-            </h2>
-            <p className="text-lg text-gray-600 mb-12">
-              Transparent pricing for businesses in {formattedCity} and across {formattedState}. No hidden fees.
-            </p>
+          <section className="mb-16 sm:mb-20 md:mb-24" id="pricing">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  How Much Does a Website Cost in {formattedState}?
+                </h2>
+                <p className="text-base sm:text-lg text-gray-600 mt-2">
+                  Transparent pricing for businesses in {formattedCity} and across {formattedState}. No hidden fees.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <CTAButtons isCompact={true} />
+              </div>
+            </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {[
                 {
                   name: 'Basic',
@@ -448,19 +511,19 @@ export default async function CityPage({ params }) {
                   ]
                 }
               ].map((plan, index) => (
-                <div key={index} className={`bg-white rounded-3xl p-8 shadow-xl ${plan.popular ? 'ring-2 ring-blue-500 shadow-2xl scale-105 relative' : ''}`}>
+                <div key={index} className={`bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl ${plan.popular ? 'ring-2 ring-blue-500 shadow-2xl scale-105 relative' : ''}`}>
                   {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-sky-400 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                    <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-sky-400 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap">
                       Most Popular
                     </div>
                   )}
-                  <h3 className="text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
-                  <div className="text-4xl font-bold text-blue-600 mb-2">{plan.price}</div>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
-                  <ul className="space-y-3 mb-8">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
+                  <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">{plan.price}</div>
+                  <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{plan.description}</p>
+                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-gray-600">
-                        <svg className="w-5 h-5 mr-3 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <li key={idx} className="flex items-center text-xs sm:text-sm text-gray-600">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {feature}
@@ -471,7 +534,7 @@ export default async function CityPage({ params }) {
                     href={`https://wa.me/2349031493116?text=Hi%20justified%20media%2C%20I'm%20interested%20in%20the%20${plan.name}%20plan%20for%20my%20business%20in%20${encodeURIComponent(formattedCity)}%2C%20${encodeURIComponent(formattedState)}.`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`block text-center px-6 py-3 rounded-xl font-semibold transition-all ${
+                    className={`block text-center px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all text-sm sm:text-base ${
                       plan.popular 
                         ? 'bg-gradient-to-r from-blue-600 to-sky-400 text-white hover:from-blue-700 hover:to-sky-500' 
                         : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
@@ -485,15 +548,22 @@ export default async function CityPage({ params }) {
           </section>
 
           {/* FAQ Section */}
-          <section className="mb-24">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              Frequently Asked Questions About Web Design in {formattedCity}
-            </h2>
-            <p className="text-lg text-gray-600 mb-12">
-              Everything you need to know about getting a website for your {formattedCity} business.
-            </p>
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  Frequently Asked Questions About Web Design in {formattedCity}
+                </h2>
+                <p className="text-base sm:text-lg text-gray-600 mt-2">
+                  Everything you need to know about getting a website for your {formattedCity} business.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <CTAButtons isCompact={true} />
+              </div>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
               {[
                 {
                   q: `How much does a website cost in ${formattedCity}?`,
@@ -512,26 +582,37 @@ export default async function CityPage({ params }) {
                   a: `Absolutely! We build websites with easy-to-use content management systems (CMS) so you can update content anytime.`
                 }
               ].map((faq, index) => (
-                <div key={index} className="bg-white rounded-2xl p-8 shadow-lg border border-blue-100">
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{faq.q}</h3>
-                  <p className="text-gray-600">{faq.a}</p>
+                <div key={index} className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 shadow-lg border border-blue-100">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-3 text-gray-900">{faq.q}</h3>
+                  <p className="text-sm sm:text-base text-gray-600">{faq.a}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* Other Cities */}
-          <section className="mb-24">
-            <h3 className="text-2xl font-bold mb-6 text-gray-900">
-              Other Cities in {formattedState} We Serve
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Other Cities in {formattedState} We Serve
+                </h3>
+                <p className="text-sm sm:text-base text-gray-600 mt-1">
+                  Web design services available across all major locations.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <CTAButtons isCompact={true} />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
               {lgas
                 .filter(c => {
                   const cityName = typeof c === 'string' ? c : c.name || c;
                   return cityName.toLowerCase().replace(/\s+/g, '-') !== city;
                 })
-                .slice(0, 15)
+                .slice(0, 20)
                 .map((otherCity, index) => {
                   const cityName = typeof otherCity === 'string' ? otherCity : otherCity.name || otherCity;
                   const citySlug = cityName.toLowerCase().replace(/\s+/g, '-');
@@ -539,9 +620,9 @@ export default async function CityPage({ params }) {
                     <Link
                       key={index}
                       href={`/web-design/${state}/${citySlug}`}
-                      className="bg-white rounded-xl p-3 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all text-center"
+                      className="bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all text-center"
                     >
-                      <span className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                      <span className="text-xs sm:text-sm text-gray-700 hover:text-blue-600 transition-colors font-medium">
                         {cityName}
                       </span>
                     </Link>
@@ -551,29 +632,14 @@ export default async function CityPage({ params }) {
           </section>
 
           {/* Final CTA */}
-          <section className="bg-gradient-to-r from-blue-600 to-sky-400 rounded-3xl p-16 text-center text-white">
-            <h2 className="text-4xl font-bold mb-4">
+          <section className="bg-gradient-to-r from-blue-600 to-sky-400 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 text-center text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
               Ready to Grow Your Business in {formattedCity}?
             </h2>
-            <p className="text-xl text-blue-50 mb-8 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-blue-50 mb-6 sm:mb-8 max-w-2xl mx-auto">
               Get a professional website that attracts more customers and grows your business.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href={`https://wa.me/2349031493116?text=Hi%20justified%20media%2C%20I'm%20ready%20to%20discuss%20my%20website%20for%20my%20business%20in%20${encodeURIComponent(formattedCity)}%2C%20${encodeURIComponent(formattedState)}.`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-8 py-4 bg-white text-blue-600 rounded-2xl text-lg font-semibold hover:bg-blue-50 transition-all"
-              >
-                Chat on WhatsApp
-              </a>
-              <a
-                href={`mailto:ofororayej@gmail.com?subject=Website%20Inquiry%20for%20${formattedCity}&body=Hi%20justified%20media%2C%20I'm%20interested%20in%20a%20website%20for%20my%20business%20in%20${formattedCity}%2C%20${formattedState}.`}
-                className="px-8 py-4 bg-blue-500/20 backdrop-blur-sm border border-white/30 text-white rounded-2xl text-lg font-semibold hover:bg-blue-500/30 transition-all"
-              >
-                Email Us
-              </a>
-            </div>
+            <CTAButtons />
           </section>
         </div>
       </div>
