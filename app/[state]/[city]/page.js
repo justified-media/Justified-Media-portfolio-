@@ -1,13 +1,9 @@
-// app/web-design/[state]/[city]/page.js
-import { createClient } from '@supabase/supabase-js';
-import { getStates, getLGAsByState } from '@some19ice/nigeria-geo-core';
-import Image from 'next/image';
-import Link from 'next/link';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+// app/[state]/[city]/page.js
+import { createClient } from '@/utils/supabase/server'
+import { getStates, getLGAsByState } from '@some19ice/nigeria-geo-core'
+import { notFound } from 'next/navigation'
+import Image from 'next/image'
+import Link from 'next/link'
 
 // Premium gradient colors for project showcases
 const gradientColors = [
@@ -38,7 +34,7 @@ export async function generateStaticParams() {
   const states = getStates();
 
   states.forEach((stateItem) => {
-    const lgas = getLGAsByState(stateItem.name);
+    const lgas = getLGAsByState(stateItem.id);
     
     lgas.forEach((city) => {
       const cityName = typeof city === 'string' ? city : city.name || city;
@@ -67,7 +63,7 @@ export async function generateMetadata({ params }) {
   ).join(' ');
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://justifiedmedia.ng';
-  const pageUrl = `${baseUrl}/web-design/${state}/${city}`;
+  const pageUrl = `${baseUrl}/${state}/${city}`;
 
   return {
     title: `Best Web Designer in ${formattedCity}, ${formattedState} | justified media`,
@@ -131,11 +127,18 @@ export default async function CityPage({ params }) {
   
   const states = getStates();
   const stateObj = states.find(s => s.id === state);
-  const formattedState = stateObj?.name || state.split('-').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
+  
+  if (!stateObj) notFound();
+  
+  const formattedState = stateObj.name;
+  const lgas = getLGAsByState(stateObj.id);
+  
+  const cityNames = lgas.map(c => typeof c === 'string' ? c : c.name || c);
+  const cityNamesNormalized = cityNames.map((name) => String(name).trim().toLowerCase());
+  if (!cityNamesNormalized.includes(formattedCity.toLowerCase())) notFound();
 
-  const lgas = stateObj ? getLGAsByState(stateObj.name) : [];
+  // Create Supabase server client for data fetching
+  const supabase = await createClient()
 
   const { data: projects } = await supabase
     .from('projects')
@@ -184,7 +187,7 @@ export default async function CityPage({ params }) {
       "latitude": "9.081999",
       "longitude": "8.675277"
     },
-    "url": `https://justifiedmedia.ng/web-design/${state}/${city}`,
+    "url": `https://justifiedmedia.ng/${state}/${city}`,
     "telephone": "+2349031493116",
     "priceRange": "₦150,000 - ₦1,500,000",
     "openingHours": "Mo-Fr 09:00-18:00",
@@ -203,6 +206,23 @@ export default async function CityPage({ params }) {
       />
       
       <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-blue-50">
+        {/* Breadcrumbs */}
+        <div className="bg-white border-b border-blue-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+              <Link href="/" className="hover:text-blue-600 transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <Link href={`/${state}`} className="hover:text-blue-600 transition-colors">
+                {formattedState}
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">{formattedCity}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-600 to-sky-400 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
@@ -607,23 +627,19 @@ export default async function CityPage({ params }) {
             </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
-              {lgas
-                .filter(c => {
-                  const cityName = typeof c === 'string' ? c : c.name || c;
-                  return cityName.toLowerCase().replace(/\s+/g, '-') !== city;
-                })
+              {cityNames
+                .filter(c => c !== formattedCity)
                 .slice(0, 20)
                 .map((otherCity, index) => {
-                  const cityName = typeof otherCity === 'string' ? otherCity : otherCity.name || otherCity;
-                  const citySlug = cityName.toLowerCase().replace(/\s+/g, '-');
+                  const citySlug = otherCity.toLowerCase().replace(/\s+/g, '-');
                   return (
                     <Link
                       key={index}
-                      href={`/web-design/${state}/${citySlug}`}
+                      href={`/${state}/${citySlug}`}
                       className="bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all text-center"
                     >
                       <span className="text-xs sm:text-sm text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                        {cityName}
+                        {otherCity}
                       </span>
                     </Link>
                   );

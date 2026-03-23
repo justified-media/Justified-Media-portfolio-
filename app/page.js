@@ -1,13 +1,8 @@
 // app/page.js
-import { createClient } from '@supabase/supabase-js';
-import { getStates } from '@some19ice/nigeria-geo-core';
-import Image from 'next/image';
-import Link from 'next/link';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { createClient } from '@/utils/supabase/server'
+import { getStates, getLGAsByState } from '@some19ice/nigeria-geo-core'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const gradientColors = [
   'from-sky-400 to-blue-500',
@@ -51,11 +46,28 @@ export async function generateMetadata() {
 
 export default async function HomePage() {
   const states = getStates();
-  
+
+  // Calculate total cities across all states
+  let totalCities = 0;
+  const statesWithCities = states.map(stateObj => {
+    // getLGAsByState expects a state id (is lower-case & hyphenated), not the display name
+    const lgas = getLGAsByState(stateObj.id);
+    const cityNames = lgas.map(c => typeof c === 'string' ? c : c.name || c);
+    totalCities += cityNames.length;
+    return {
+      ...stateObj,
+      cities: cityNames,
+      cityCount: cityNames.length
+    };
+  });
+
+  // Create Supabase server client for data fetching
+  const supabase = await createClient()
+
   const { data: projects } = await supabase
     .from('projects')
     .select('*')
-    .limit(3);
+    .limit(6);
 
   const safeProjects = projects || [];
 
@@ -99,43 +111,98 @@ export default async function HomePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        {/* States We Serve */}
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16 sm:mb-20">
+          <div className="bg-white rounded-2xl p-6 text-center shadow-lg border border-blue-100">
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">{states.length}</div>
+            <div className="text-sm sm:text-base text-gray-600">States Covered</div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 text-center shadow-lg border border-blue-100">
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">{totalCities}+</div>
+            <div className="text-sm sm:text-base text-gray-600">Cities & Towns</div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 text-center shadow-lg border border-blue-100">
+            <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">100%</div>
+            <div className="text-sm sm:text-base text-gray-600">Client Satisfaction</div>
+          </div>
+        </div>
+
+        {/* All States Section */}
         <section className="mb-16 sm:mb-20 md:mb-24">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-gray-900">
-            Web Design Services Across Nigeria
+            Web Design Services Across All 36 States
           </h2>
           <p className="text-base sm:text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-            We provide professional web design services in all states of Nigeria.
+            We provide professional web design services in every state of Nigeria, covering all major cities and towns.
           </p>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {states.slice(0, 12).map((stateObj) => {
-              const stateName = stateObj.name;
-              const stateSlug = stateObj.id;
-              return (
-                <Link
-                  key={stateSlug}
-                  href={`/${stateSlug}`}
-                  className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all text-center"
-                >
-                  <span className="text-xs sm:text-sm text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                    {stateName}
+            {statesWithCities.map((stateObj) => (
+              <Link
+                key={stateObj.id}
+                href={`/${stateObj.id}`}
+                className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all group"
+              >
+                <div className="text-center">
+                  <span className="text-xs sm:text-sm text-gray-700 group-hover:text-blue-600 transition-colors font-medium block">
+                    {stateObj.name}
                   </span>
-                </Link>
-              );
-            })}
+                  <span className="text-xs text-gray-400 mt-1 block">
+                    {stateObj.cityCount} cities
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
+        </section>
+
+        {/* Featured States with Cities */}
+        <section className="mb-16 sm:mb-20 md:mb-24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 text-gray-900">
+            Popular States & Their Cities
+          </h2>
+          <p className="text-base sm:text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            Explore our web design services in Nigeria's most populous states.
+          </p>
           
-          <div className="text-center mt-8">
-            <Link
-              href="/states"
-              className="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700"
-            >
-              View all states
-              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {statesWithCities.slice(0, 6).map((stateObj) => (
+              <div key={stateObj.id} className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden hover:shadow-2xl transition-all">
+                <div className="bg-gradient-to-r from-blue-600 to-sky-400 p-4">
+                  <Link href={`/${stateObj.id}`}>
+                    <h3 className="text-xl font-bold text-white text-center hover:underline">
+                      {stateObj.name}
+                    </h3>
+                  </Link>
+                </div>
+                <div className="p-5">
+                  <div className="grid grid-cols-2 gap-2">
+                    {stateObj.cities.slice(0, 8).map((city, idx) => {
+                      const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+                      return (
+                        <Link
+                          key={idx}
+                          href={`/${stateObj.id}/${citySlug}`}
+                          className="text-sm text-gray-600 hover:text-blue-600 transition-colors py-1"
+                        >
+                          {city}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  {stateObj.cityCount > 8 && (
+                    <div className="text-center mt-4">
+                      <Link
+                        href={`/${stateObj.id}`}
+                        className="text-sm text-blue-600 font-semibold hover:text-blue-700"
+                      >
+                        +{stateObj.cityCount - 8} more cities
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

@@ -1,13 +1,9 @@
-// app/web-design/[state]/page.js
-import { createClient } from '@supabase/supabase-js';
-import { getStates, getLGAsByState } from '@some19ice/nigeria-geo-core';
-import Image from 'next/image';
-import Link from 'next/link';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+// app/[state]/page.js
+import { createClient } from '@/utils/supabase/server'
+import { getStates, getLGAsByState } from '@some19ice/nigeria-geo-core'
+import { notFound } from 'next/navigation'
+import Image from 'next/image'
+import Link from 'next/link'
 
 // Premium gradient colors for project showcases
 const gradientColors = [
@@ -33,6 +29,9 @@ const isValidImageUrl = (url) => {
   }
 };
 
+// List of reserved paths that should not be treated as states
+const reservedPaths = ['sitemap', 'sitemap.xml', 'robots', 'admin', 'api', 'favicon.ico'];
+
 export async function generateStaticParams() {
   const states = getStates();
   return states.map((stateObj) => ({
@@ -43,11 +42,19 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { state } = await params;
   
+  // Check if this is a reserved path
+  if (reservedPaths.includes(state)) {
+    return { title: 'Page Not Found' };
+  }
+  
   const states = getStates();
   const stateObj = states.find(s => s.id === state);
-  const formattedState = stateObj?.name || state.split('-').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
+  
+  if (!stateObj) {
+    return { title: 'Page Not Found' };
+  }
+  
+  const formattedState = stateObj.name;
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://justifiedmedia.ng';
   const pageUrl = `${baseUrl}/web-design/${state}`;
@@ -108,13 +115,27 @@ export async function generateMetadata({ params }) {
 export default async function StatePage({ params }) {
   const { state } = await params;
   
+  // Check if this is a reserved path
+  if (reservedPaths.includes(state)) {
+    notFound();
+  }
+  
   const states = getStates();
   const stateObj = states.find(s => s.id === state);
-  const formattedState = stateObj?.name || state.split('-').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
+  
+  if (!stateObj) notFound();
+  
+  const formattedState = stateObj.name;
+  
+  // Get all LGAs/cities for this state using the stable state id
+  const lgas = getLGAsByState(stateObj.id);
+  const cityNames = lgas.map(c => typeof c === 'string' ? c : c.name || c).filter(c => c && c.trim() !== '');
+  
+  // Sort cities alphabetically for better UX
+  const sortedCities = [...cityNames].sort();
 
-  const lgas = stateObj ? getLGAsByState(stateObj.name) : [];
+  // Create Supabase server client for data fetching
+  const supabase = await createClient()
 
   const { data: projects } = await supabase
     .from('projects')
@@ -181,6 +202,24 @@ export default async function StatePage({ params }) {
       />
       
       <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-blue-50">
+        {/* Breadcrumbs */}
+        <div className="bg-white border-b border-blue-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link href="/" className="hover:text-blue-600 transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">{formattedState}</span>
+              <span className="ml-auto">
+                <Link href="/sitemap.xml" className="text-xs text-gray-400 hover:text-blue-600 transition-colors">
+                  Sitemap
+                </Link>
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-600 to-sky-400 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
@@ -568,15 +607,18 @@ export default async function StatePage({ params }) {
             </div>
           </section>
 
-          {/* Cities Section */}
+          {/* All Cities Section - Fixed */}
           <section className="mb-16 sm:mb-20 md:mb-24">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6 sm:mb-8">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  Cities We Serve in {formattedState}
+                  All Cities in {formattedState}
                 </h2>
                 <p className="text-base sm:text-lg text-gray-600 mt-2">
-                  We provide web design services across all major cities in {formattedState}.
+                  {sortedCities.length > 0 
+                    ? `We provide web design services in all ${sortedCities.length} cities across ${formattedState}.`
+                    : `We provide web design services across all major locations in ${formattedState}.`
+                  }
                 </p>
               </div>
               <div className="mt-4 md:mt-0">
@@ -584,23 +626,38 @@ export default async function StatePage({ params }) {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
-              {lgas.slice(0, 20).map((city, index) => {
-                const cityName = typeof city === 'string' ? city : city.name || city;
-                const citySlug = cityName.toLowerCase().replace(/\s+/g, '-');
-                return (
-                  <Link
-                    key={index}
-                    href={`/web-design/${state}/${citySlug}`}
-                    className="bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all text-center"
-                  >
-                    <span className="text-xs sm:text-sm text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                      {cityName}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
+            {sortedCities.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3">
+                  {sortedCities.map((city, index) => {
+                    const citySlug = city.toLowerCase().replace(/\s+/g, '-');
+                    return (
+                      <Link
+                        key={index}
+                        href={`/${state}/${citySlug}`}
+                        className="bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 border border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all text-center group"
+                      >
+                        <span className="text-xs sm:text-sm text-gray-700 group-hover:text-blue-600 transition-colors font-medium">
+                          {city}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <div className="text-center mt-6">
+                  <p className="text-sm text-gray-500">
+                    {sortedCities.length} cities available in {formattedState}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-8 text-center">
+                <p className="text-lg text-blue-800 mb-2">📍 Cities Loading</p>
+                <p className="text-sm text-blue-600">
+                  We're loading the list of cities in {formattedState}. Please check back soon!
+                </p>
+              </div>
+            )}
           </section>
 
           {/* Final CTA */}
