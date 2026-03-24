@@ -106,6 +106,11 @@ export default async function HomePage() {
               justified media creates stunning, high-converting websites that help businesses across Nigeria stand out and attract more customers.
             </p>
             <CTAButtons />
+            <div className="mt-8 text-center">
+              <Link href="/sitemap.xml" className="text-sm text-white underline hover:text-blue-100">
+                View our sitemap for all pages (XML)
+              </Link>
+            </div>
           </div>
         </div>
       </div>

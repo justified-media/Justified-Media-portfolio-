@@ -24,6 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="alternate" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -14,6 +14,17 @@ export default async function sitemap() {
     changeFrequency: 'weekly',
     priority: 1.0,
   });
+
+  // Other key pages
+  const extraPaths = ['web-design', 'admin', 'admin/login'];
+  for (const path of extraPaths) {
+    urls.push({
+      url: `${baseUrl}/${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    });
+  }
   
   // State pages
   for (const stateObj of states) {
