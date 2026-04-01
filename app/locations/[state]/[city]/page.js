@@ -64,7 +64,7 @@ export async function generateMetadata({ params }) {
     }
 
     // Enhanced SEO metadata with Open Graph and Twitter cards
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://justifiedmedia.ng'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://web-dev-nigeria.vercel.app'
     const pageUrl = `${baseUrl}/locations/${state}/${city}`
 
     return {

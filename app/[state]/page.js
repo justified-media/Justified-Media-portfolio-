@@ -56,7 +56,7 @@ export async function generateMetadata({ params }) {
   
   const formattedState = stateObj.name;
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://justifiedmedia.ng';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://web-dev-nigeria.vercel.app';
   const pageUrl = `${baseUrl}/web-design/${state}`;
 
   return {
@@ -172,7 +172,7 @@ export default async function StatePage({ params }) {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": `justified media - Web Designers in ${formattedState}`,
-    "image": "https://justifiedmedia.ng/logo.jpg",
+    "image": "https://web-dev-nigeria.vercel.app/logo.jpg",
     "address": {
       "@type": "PostalAddress",
       "addressRegion": formattedState,
@@ -183,7 +183,7 @@ export default async function StatePage({ params }) {
       "latitude": "9.081999",
       "longitude": "8.675277"
     },
-    "url": `https://justifiedmedia.ng/web-design/${state}`,
+    "url": `https://web-dev-nigeria.vercel.app/web-design/${state}`,
     "telephone": "+2349031493116",
     "priceRange": "₦150,000 - ₦1,500,000",
     "openingHours": "Mo-Fr 09:00-18:00",

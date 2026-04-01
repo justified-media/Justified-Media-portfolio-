@@ -62,7 +62,7 @@ export async function generateMetadata({ params }) {
     word.charAt(0).toUpperCase() + word.slice(1)
   ).join(' ');
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://justifiedmedia.ng';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://web-dev-nigeria.vercel.app';
   const pageUrl = `${baseUrl}/${state}/${city}`;
 
   return {
@@ -175,7 +175,7 @@ export default async function CityPage({ params }) {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": `justified media - Web Designer in ${formattedCity}, ${formattedState}`,
-    "image": "https://justifiedmedia.ng/logo.jpg",
+    "image": "https://web-dev-nigeria.vercel.app/logo.jpg",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": formattedCity,
@@ -187,7 +187,7 @@ export default async function CityPage({ params }) {
       "latitude": "9.081999",
       "longitude": "8.675277"
     },
-    "url": `https://justifiedmedia.ng/${state}/${city}`,
+    "url": `https://web-dev-nigeria.vercel.app/${state}/${city}`,
     "telephone": "+2349031493116",
     "priceRange": "₦150,000 - ₦1,500,000",
     "openingHours": "Mo-Fr 09:00-18:00",

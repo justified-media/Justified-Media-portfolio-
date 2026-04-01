@@ -2,7 +2,7 @@
 import { getStates, getLGAsByState } from '@some19ice/nigeria-geo-core';
 
 export default async function sitemap() {
-  const baseUrl = 'https://justifiedmedia.ng';
+  const baseUrl = 'https://web-dev-nigeria.vercel.app';
   const states = getStates();
   
   const urls = [];
@@ -15,17 +15,6 @@ export default async function sitemap() {
     priority: 1.0,
   });
 
-  // Other key pages
-  const extraPaths = ['web-design', 'admin', 'admin/login'];
-  for (const path of extraPaths) {
-    urls.push({
-      url: `${baseUrl}/${path}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    });
-  }
-  
   // State pages
   for (const stateObj of states) {
     urls.push({

@@ -35,7 +35,7 @@ export async function generateMetadata() {
     openGraph: {
       title: 'Professional Web Design Services Nigeria | justified media',
       description: 'Expert web design services across Nigeria. Create a stunning website for your business. Starting at ₦150,000.',
-      url: 'https://justifiedmedia.ng',
+      url: 'https://web-dev-nigeria.vercel.app',
       siteName: 'justified media',
       images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
       locale: 'en_NG',
